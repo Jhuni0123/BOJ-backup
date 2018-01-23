@@ -29,7 +29,7 @@ class BOJ:
             self.user_id = tag.text
             return True
 
-    def get_submit_ids(self, result_id=None):
+    def get_submit_ids(self, result_id=None, limit=None):
         params = {'user_id': self.user_id}
         if result_id is not None:
             params['result_id'] = result_id
@@ -41,10 +41,17 @@ class BOJ:
         while next:
             r = self.session.get(BOJ.url(next))
             soup = BeautifulSoup(r.text, 'html5lib')
+
             table_body = soup.find('tbody')
             rows = table_body.find_all('tr')
             ids = map(lambda row: row.find('td').text, rows)
+
             submits.extend(ids)
+
+            if limit is not None:
+                if len(submits) >= limit:
+                    submits = submits[:limit]
+                    break
 
             next_tag = soup.find('a', id='next_page')
             if next_tag is None:
@@ -58,7 +65,7 @@ class BOJ:
         url = BOJ.url('/source/' + submit_id)
         r = self.session.get(url)
         soup = BeautifulSoup(r.text, 'html5lib')
-        sourcecode = soup.find('textarea', id='source')
+        sourcecode = soup.find('textarea', id='source').text
 
         lang_id = int(soup.find('input', id='language').get('value'))
         tds = soup.find('tbody').tr.find_all('td')
