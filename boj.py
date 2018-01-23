@@ -29,16 +29,22 @@ class BOJ:
             self.user_id = tag.text
             return True
 
-    def get_submit_ids(self, result_id=None, limit=None):
+    def get_submit_ids(self, result_id=None, limit=None, silent=False):
         params = {'user_id': self.user_id}
         if result_id is not None:
             params['result_id'] = result_id
 
         next = '/status/?' + urlencode(params)
 
+        lim_str = '?'
+        if limit is not None:
+            lim_str = str(limit)
+
         submits = []
 
         while next:
+            if not silent:
+                print('\rCollecting submit list (%d/%s)' % (len(submits), lim_str), end='')
             r = self.session.get(BOJ.url(next))
             soup = BeautifulSoup(r.text, 'html5lib')
 
@@ -59,6 +65,8 @@ class BOJ:
             else:
                 next = next_tag.get('href')
 
+        if not silent:
+            print('\rCollecting submit list (%d/%s)...Done!' % (len(submits), lim_str))
         return submits
 
     def get_sourcecode(self, submit_id):
