@@ -16,7 +16,6 @@ python3 backup.py # --help
 
 ### options
 - `-l`, `--limit`: limit the number of codes to backup from recent code
-- `-s`, `--silent`: do not show progress
 - `-r`, `--result`: select result of submission (default: 4)
     - `-1`: 모든 결과
     - `4`: 맞았습니다!!
