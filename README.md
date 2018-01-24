@@ -18,4 +18,12 @@ python3 backup.py # --help
 - `-l`, `--limit`: limit the number of codes to backup from recent code
 - `-s`, `--silent`: do not show progress
 - `-r`, `--result`: select result of submission (default: 4)
-    - `4`: '맞았습니다!'
+    - `-1`: 모든 결과
+    - `4`: 맞았습니다!!
+    - `5`: 출력 형식
+    - `6`: 틀렸습니다
+    - `7`: 시간 초과
+    - `8`: 메모리 초과
+    - `9`: 출력 초과
+    - `10`: 런타임 에러
+    - `11`: 컴파일 에러
