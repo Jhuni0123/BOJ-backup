@@ -105,5 +105,15 @@ class BOJ:
             return "js"
         elif lang == 22:
             return "ml"
+        elif lang == 44:
+            return "rs"
+        elif lang == 12:
+            return "go"
+        elif lang == 16:
+            return "lua"
+        elif lang == 27:
+            return "asm"
+        elif lang == 72:
+            return "R"
         else:
             return "txt"
