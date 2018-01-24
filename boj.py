@@ -29,7 +29,7 @@ class BOJ:
             self.user_id = tag.text
             return True
 
-    def get_submit_ids(self, result_id=None, limit=None, silent=False):
+    def get_submission_list(self, result_id=None, limit=None):
         params = {'user_id': self.user_id}
         if result_id is not None:
             params['result_id'] = result_id
@@ -40,37 +40,37 @@ class BOJ:
         if limit is not None:
             lim_str = str(limit)
 
-        submits = []
+        submissions = []
+
+        def prompt_process():
+            print('\rCollecting submission list (%d/%s)' % (len(submissions), lim_str), end='')
 
         while next:
-            if not silent:
-                print('\rCollecting submit list (%d/%s)' % (len(submits), lim_str), end='')
+            prompt_process()
             r = self.session.get(BOJ.url(next))
             soup = BeautifulSoup(r.text, 'html5lib')
 
             table_body = soup.find('tbody')
             rows = table_body.find_all('tr')
-            ids = map(lambda row: row.find('td').text, rows)
-
-            submits.extend(ids)
-
-            if limit is not None:
-                if len(submits) >= limit:
-                    submits = submits[:limit]
+            for row in rows:
+                cols = row.find_all('td')
+                submissions.append({'submission_id': cols[0].text.strip(), 'problem_id': cols[2].text.strip()})
+                if len(submissions) == limit:
                     break
+            if len(submissions) == limit:
+                break
 
             next_tag = soup.find('a', id='next_page')
             if next_tag is None:
                 next = None
             else:
                 next = next_tag.get('href')
+        prompt_process()
+        print('..Done!')
+        return submissions
 
-        if not silent:
-            print('\rCollecting submit list (%d/%s)...Done!' % (len(submits), lim_str))
-        return submits
-
-    def get_sourcecode(self, submit_id):
-        url = BOJ.url('/source/' + submit_id)
+    def get_submission_info(self, submission_id):
+        url = BOJ.url('/source/' + submission_id)
         r = self.session.get(url)
         soup = BeautifulSoup(r.text, 'html5lib')
         sourcecode = soup.find('textarea', id='source').text

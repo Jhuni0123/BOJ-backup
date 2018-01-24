@@ -6,8 +6,6 @@ import argparse
 
 def process_argument():
     parser = argparse.ArgumentParser(description='Backup BOJ source codes.')
-    parser.add_argument('-s', '--silent', action='store_true',
-                        help='do not show progress')
     parser.add_argument('-l', '--limit', type=int, default=None,
                         help='limit the number of codes to backup from recent code')
     parser.add_argument('-r', '--result', type=int, default=4,
@@ -30,7 +28,7 @@ if __name__ == '__main__':
         print('error: invalid id or password')
         exit(1)
 
-    submit_ids = myboj.get_submit_ids(args.result, args.limit, args.silent)
+    submission_list = myboj.get_submission_list(args.result, args.limit)
 
     # backup
     dirname = 'BOJ-' + myboj.user_id
@@ -40,17 +38,14 @@ if __name__ == '__main__':
     except FileExistsError:
         pass
 
-    if not args.silent:
-        print("Backing-up in '%s/'" % dirname)
+    print("Backing-up in '%s/'" % dirname)
 
-    for idx, submit_id in enumerate(submit_ids):
-        submit = myboj.get_sourcecode(submit_id)
+    for idx, submit in enumerate(submission_list):
+        submit = {**myboj.get_submission_info(submit['submission_id']), **submit}
 
-        filename = '%s-%s-%s.%s' % (submit_id, submit['problem_id'], submit['lang'], submit['ext'])
+        filename = '%s-%s-%s.%s' % (submit['submission_id'], submit['problem_id'], submit['lang'], submit['ext'])
         f = open(os.path.join(dirname, filename), 'w')
         f.write(submit['sourcecode'])
         f.close()
-        if not args.silent:
-            print("\r(%d/%d) '%s' saved.     " % (idx+1, len(submit_ids), filename), end='')
-    if not args.silent:
-        print('\nDone!')
+        print("\r(%d/%d) '%s' saved.     " % (idx+1, len(submission_list), filename), end='')
+    print('\nDone!')
