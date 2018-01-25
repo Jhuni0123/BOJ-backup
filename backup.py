@@ -26,6 +26,8 @@ def process_argument():
                         '''))
     parser.add_argument('-v', '--verbose', default=False, action='store_true',
                         help='print details of backup')
+    parser.add_argument('-d', '--destination', type=str, default=None,
+                        help='set backup destination')
     return parser.parse_args()
 
 
@@ -48,7 +50,7 @@ if __name__ == '__main__':
         submission_list = myboj.get_submission_list(args.result, args.limit, args.verbose)
 
         # backup
-        dirname = 'BOJ-' + myboj.user_id
+        dirname = args.destination if args.destination is not None else 'BOJ-' + myboj.user_id
 
         try:
             os.mkdir(dirname, 0o755)
