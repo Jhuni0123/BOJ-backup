@@ -2,7 +2,6 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urlencode
 
-
 class BOJ:
     host = 'www.acmicpc.net'
 
@@ -29,21 +28,22 @@ class BOJ:
             self.user_id = tag.text
             return True
 
-    def get_submission_list(self, result_id=None, limit=None):
+    def get_submission_list(self, result_id=None, limit=None, verbose=False):
         params = {'user_id': self.user_id}
         if result_id is not None:
             params['result_id'] = result_id
 
         next = '/status/?' + urlencode(params)
 
-        lim_str = '?'
+        lim_str = 'inf'
         if limit is not None:
             lim_str = str(limit)
 
         submissions = []
 
         def prompt_process():
-            print('\rCollecting submission list (%d/%s)' % (len(submissions), lim_str), end='')
+            if verbose:
+                print('\rCollecting submission list of size %d(max: %s)' % (len(submissions), lim_str), end='')
 
         while next:
             prompt_process()
@@ -66,7 +66,8 @@ class BOJ:
             else:
                 next = next_tag.get('href')
         prompt_process()
-        print('..Done!')
+        if verbose:
+            print('..Done!')
         return submissions
 
     def get_submission_info(self, submission_id):

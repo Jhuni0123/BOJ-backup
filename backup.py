@@ -24,6 +24,8 @@ def process_argument():
                         10: 런타임 에러
                         11: 컴파일 에러
                         '''))
+    parser.add_argument('-v', '--verbose', default=False, action='store_true',
+                        help='print details of backup')
     return parser.parse_args()
 
 
@@ -43,7 +45,7 @@ if __name__ == '__main__':
             print('error: invalid id or password')
             exit(1)
 
-        submission_list = myboj.get_submission_list(args.result, args.limit)
+        submission_list = myboj.get_submission_list(args.result, args.limit, args.verbose)
 
         # backup
         dirname = 'BOJ-' + myboj.user_id
@@ -62,7 +64,8 @@ if __name__ == '__main__':
             f = open(os.path.join(dirname, filename), 'w')
             f.write(submit['sourcecode'])
             f.close()
-            print("\r(%d/%d) %35s saved." % (idx+1, len(submission_list), filename), end='')
+            if args.verbose:
+                print("(%d/%d) %35s saved." % (idx+1, len(submission_list), filename))
         print('\nDone!')
     except requests.exceptions.ConnectionError:
         print('error: network connection is not reliable')
